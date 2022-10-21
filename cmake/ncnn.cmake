@@ -9,8 +9,11 @@ function(download_ncnn)
 
   include(FetchContent)
 
-  set(ncnn_URL  "https://github.com/csukuangfj/ncnn/archive/refs/tags/sherpa-0.5.tar.gz")
-  set(ncnn_HASH "SHA256=73ddc84406bc8fd8aa98fc05284534e3fdfbee39ee2ec8592dfbbfad28717bfd")
+  # set(ncnn_URL  "https://github.com/csukuangfj/ncnn/archive/refs/tags/sherpa-0.5.tar.gz")
+  # set(ncnn_HASH "SHA256=73ddc84406bc8fd8aa98fc05284534e3fdfbee39ee2ec8592dfbbfad28717bfd")
+
+  set(ncnn_URL  "https://github.com/csukuangfj/ncnn/archive/e06573175d4f078c0c83fad17f0d1aab1ffbf13e.zip")
+  set(ncnn_HASH "SHA256=f2ff1c8dbc7896e5f794fe2b2b2be5761358358605a379e5a0e2a87bff359491")
 
   FetchContent_Declare(ncnn
     URL               ${ncnn_URL}
@@ -144,7 +147,7 @@ function(download_ncnn)
 
   FetchContent_GetProperties(ncnn)
   if(NOT ncnn_POPULATED)
-    message(STATUS "Downloading ncnn")
+    message(STATUS "Downloading ncnn ${ncnn_URL}")
     FetchContent_Populate(ncnn)
   endif()
   message(STATUS "ncnn is downloaded to ${ncnn_SOURCE_DIR}")
