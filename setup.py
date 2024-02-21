@@ -11,6 +11,7 @@ from cmake.cmake_extension import (
     BuildExtension,
     bdist_wheel,
     cmake_extension,
+    enable_alsa,
     is_windows,
 )
 
@@ -35,6 +36,34 @@ package_name = "sherpa-ncnn"
 with open("sherpa-ncnn/python/sherpa_ncnn/__init__.py", "a") as f:
     f.write(f"__version__ = '{get_package_version()}'\n")
 
+
+def get_binaries_to_install():
+    bin_dir = Path("build") / "sherpa_ncnn" / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    suffix = ".exe" if is_windows() else ""
+
+    # Remember to also change cmake/cmake_extension.py
+    binaries = ["sherpa-ncnn"]
+    binaries += ["sherpa-ncnn-microphone"]
+
+    if enable_alsa():
+        binaries += ["sherpa-ncnn-alsa"]
+
+    if is_windows():
+        binaries += ["kaldi-native-fbank-core.dll"]
+        binaries += ["sherpa-ncnn-c-api.dll"]
+        binaries += ["sherpa-ncnn-core.dll"]
+        binaries += ["sherpa-ncnn-portaudio.dll"]
+        binaries += ["ncnn.dll"]
+
+    exe = []
+    for f in binaries:
+        suffix = "" if (".dll" in f or ".lib" in f) else suffix
+        t = bin_dir / (f + suffix)
+        exe.append(str(t))
+    return exe
+
+
 install_requires = [
     "numpy",
 ]
@@ -50,6 +79,7 @@ setuptools.setup(
         "sherpa_ncnn": "sherpa-ncnn/python/sherpa_ncnn",
     },
     packages=["sherpa_ncnn"],
+    data_files=[("bin", get_binaries_to_install())],
     url="https://github.com/k2-fsa/sherpa-ncnn",
     long_description=read_long_description(),
     long_description_content_type="text/markdown",

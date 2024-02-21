@@ -24,6 +24,23 @@ def is_windows():
     return platform.system() == "Windows"
 
 
+def is_x86():
+    return platform.machine() in ["i386", "i686", "x86_64"]
+
+
+def is_arm64():
+    return platform.machine() in ["arm64", "aarch64"]
+
+
+def is_linux():
+    return platform.system() == "Linux"
+
+
+def enable_alsa():
+    build_alsa = os.environ.get("SHERPA_NCNN_ENABLE_ALSA", None)
+    return build_alsa and is_linux() and (is_arm64() or is_x86())
+
+
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
 
@@ -38,7 +55,6 @@ try:
                 # The generated wheel has a name ending with
                 # -linux_x86_64.whl
                 self.root_is_pure = False
-
 
 except ImportError:
     bdist_wheel = None
@@ -58,6 +74,7 @@ class BuildExtension(build_ext):
         # build/lib.linux-x86_64-3.8
         os.makedirs(self.build_lib, exist_ok=True)
 
+        out_bin_dir = Path(self.build_lib).parent.resolve() / "sherpa_ncnn" / "bin"
         install_dir = Path(self.build_lib).resolve() / "sherpa_ncnn"
 
         sherpa_ncnn_dir = Path(__file__).parent.parent.resolve()
@@ -71,8 +88,11 @@ class BuildExtension(build_ext):
 
         extra_cmake_args = f" -DCMAKE_INSTALL_PREFIX={install_dir} "
         extra_cmake_args += f" -DBUILD_SHARED_LIBS=ON "
+        extra_cmake_args += f" -DSHERPA_NCNN_ENABLE_BINARY=ON "
         extra_cmake_args += f" -DSHERPA_NCNN_ENABLE_PYTHON=ON "
-        extra_cmake_args += f" -DSHERPA_NCNN_ENABLE_PORTAUDIO=OFF "
+        extra_cmake_args += f" -DSHERPA_NCNN_ENABLE_PORTAUDIO=ON "
+        extra_cmake_args += f" -DSHERPA_NCNN_ENABLE_C_API=ON "
+        extra_cmake_args += f" -DSHERPA_NCNN_ENABLE_GENERATE_INT8_SCALE_TABLE=OFF "
 
         if "PYTHON_EXECUTABLE" not in cmake_args:
             print(f"Setting PYTHON_EXECUTABLE to {sys.executable}")
@@ -133,3 +153,41 @@ class BuildExtension(build_ext):
                 continue
 
             shutil.rmtree(str(d))
+
+        suffix = ".exe" if is_windows() else ""
+        # Remember to also change setup.py
+
+        bin_dir = Path("build") / "sherpa_ncnn" / "bin"
+        bin_dir.mkdir(parents=True, exist_ok=True)
+        suffix = ".exe" if is_windows() else ""
+
+        # Remember to also change cmake/cmake_extension.py
+        binaries = ["sherpa-ncnn"]
+        binaries += ["sherpa-ncnn-microphone"]
+
+        if enable_alsa():
+            binaries += ["sherpa-ncnn-alsa"]
+
+        if is_windows():
+            binaries += ["kaldi-native-fbank-core.dll"]
+            binaries += ["sherpa-ncnn-c-api.dll"]
+            binaries += ["sherpa-ncnn-core.dll"]
+            binaries += ["sherpa-ncnn-portaudio.dll"]
+            binaries += ["ncnn.dll"]
+
+        for f in binaries:
+            suffix = "" if (".dll" in f or ".lib" in f) else suffix
+            src_file = install_dir / "bin" / (f + suffix)
+            print("f", f, "src_file", src_file)
+            if not src_file.is_file():
+                src_file = install_dir / "lib" / (f + suffix)
+            if not src_file.is_file():
+                src_file = install_dir / ".." / (f + suffix)
+
+            print(f"Copying {src_file} to {out_bin_dir}/")
+            shutil.copy(f"{src_file}", f"{out_bin_dir}/")
+
+        shutil.rmtree(f"{install_dir}/bin")
+
+        if is_windows():
+            shutil.rmtree(f"{install_dir}/lib")

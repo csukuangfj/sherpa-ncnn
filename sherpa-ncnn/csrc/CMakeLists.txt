@@ -1,5 +1,15 @@
 include_directories(${CMAKE_SOURCE_DIR})
 
+if(SHERPA_NCNN_ENABLE_PYTHON)
+  message(STATUS "PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
+  execute_process(
+    COMMAND "${PYTHON_EXECUTABLE}" -c "import sys; print('.'.join(sys.version.split('.')[:2]))"
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE PYTHON_VERSION
+  )
+  message(STATUS "PYTHON_VERSION: ${PYTHON_VERSION}")
+endif()
+
 set(sherpa_ncnn_core_srcs
   context-graph.cc
   conv-emformer-model.cc
@@ -32,45 +42,58 @@ else()
   install(TARGETS sherpa-ncnn-core DESTINATION lib)
 endif()
 
-if(NOT SHERPA_NCNN_ENABLE_PYTHON)
-  if(SHERPA_NCNN_ENABLE_BINARY)
-    add_executable(sherpa-ncnn sherpa-ncnn.cc)
-    target_link_libraries(sherpa-ncnn PRIVATE sherpa-ncnn-core)
-    install(TARGETS sherpa-ncnn DESTINATION bin)
+if(SHERPA_NCNN_ENABLE_BINARY)
+  add_executable(sherpa-ncnn sherpa-ncnn.cc)
+  target_link_libraries(sherpa-ncnn sherpa-ncnn-core)
+  install(TARGETS sherpa-ncnn DESTINATION bin)
 
-    if(SHERPA_NCNN_HAS_ALSA)
-      add_executable(sherpa-ncnn-alsa sherpa-ncnn-alsa.cc alsa.cc)
-      target_link_libraries(sherpa-ncnn-alsa PRIVATE sherpa-ncnn-core)
+  set(main_exes sherpa-ncnn)
 
-      if(DEFINED ENV{SHERPA_NCNN_ALSA_LIB_DIR})
-        target_link_libraries(sherpa-ncnn-alsa PRIVATE -L$ENV{SHERPA_NCNN_ALSA_LIB_DIR} -lasound)
-      else()
-        target_link_libraries(sherpa-ncnn-alsa PRIVATE asound)
+  if(SHERPA_NCNN_HAS_ALSA)
+    add_executable(sherpa-ncnn-alsa sherpa-ncnn-alsa.cc alsa.cc)
+    target_link_libraries(sherpa-ncnn-alsa sherpa-ncnn-core)
+
+    if(DEFINED ENV{SHERPA_NCNN_ALSA_LIB_DIR})
+      target_link_libraries(sherpa-ncnn-alsa -L$ENV{SHERPA_NCNN_ALSA_LIB_DIR} -lasound)
+    else()
+      target_link_libraries(sherpa-ncnn-alsa asound)
+    endif()
+    install(TARGETS sherpa-ncnn-alsa DESTINATION bin)
+    list(APPEND main_exes sherpa-ncnn-alsa)
+  endif()
+
+  if(SHERPA_NCNN_ENABLE_PORTAUDIO)
+    add_executable(sherpa-ncnn-microphone
+      sherpa-ncnn-microphone.cc
+      microphone.cc
+    )
+    list(APPEND main_exes sherpa-ncnn-microphone)
+
+    if(BUILD_SHARED_LIBS)
+      set(PA_LIB portaudio)
+    else()
+      set(PA_LIB portaudio_static)
+    endif()
+
+    target_link_libraries(sherpa-ncnn-microphone ${PA_LIB} sherpa-ncnn-core)
+
+    install(TARGETS sherpa-ncnn-microphone DESTINATION bin)
+  endif()
+
+  if(SHERPA_NCNN_ENABLE_GENERATE_INT8_SCALE_TABLE)
+    add_executable(generate-int8-scale-table generate-int8-scale-table.cc)
+    target_link_libraries(generate-int8-scale-table sherpa-ncnn-core)
+  endif()
+
+  if(NOT WIN32)
+    foreach(exe IN LISTS main_exes)
+      target_link_libraries(${exe} "-Wl,-rpath,${SHERPA_NCNN_RPATH_ORIGIN}/../lib")
+      target_link_libraries(${exe} "-Wl,-rpath,${SHERPA_NCNN_RPATH_ORIGIN}/../../../sherpa_ncnn/lib")
+
+      if(SHERPA_NCNN_ENABLE_PYTHON)
+        target_link_libraries(${exe} "-Wl,-rpath,${SHERPA_NCNN_RPATH_ORIGIN}/../lib/python${PYTHON_VERSION}/site-packages/sherpa_ncnn/lib")
       endif()
-      install(TARGETS sherpa-ncnn-alsa DESTINATION bin)
-    endif()
-
-    if(SHERPA_NCNN_ENABLE_PORTAUDIO)
-      add_executable(sherpa-ncnn-microphone
-        sherpa-ncnn-microphone.cc
-        microphone.cc
-      )
-
-      if(BUILD_SHARED_LIBS)
-        set(PA_LIB portaudio)
-      else()
-        set(PA_LIB portaudio_static)
-      endif()
-
-      target_link_libraries(sherpa-ncnn-microphone PRIVATE ${PA_LIB} sherpa-ncnn-core)
-
-      install(TARGETS sherpa-ncnn-microphone DESTINATION bin)
-    endif()
-
-    if(SHERPA_NCNN_ENABLE_GENERATE_INT8_SCALE_TABLE)
-      add_executable(generate-int8-scale-table generate-int8-scale-table.cc)
-      target_link_libraries(generate-int8-scale-table sherpa-ncnn-core)
-    endif()
+    endforeach()
   endif()
 endif()
 

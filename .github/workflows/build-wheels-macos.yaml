@@ -50,6 +50,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
+          name: ${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
 
       - name: Publish to huggingface
