@@ -129,7 +129,7 @@ class BuildExtension(build_ext):
 
                 cmake {cmake_args} {sherpa_ncnn_dir}
 
-                make {make_args} install/strip
+                make {make_args} install
             """
             print(f"build command is:\n{build_cmd}")
 
