@@ -28,6 +28,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
+      - name: ndk-fix-debug
+        run: sed -i -e '/^  -g$/d' $ANDROID_NDK_LATEST_HOME/build/cmake/android-legacy.toolchain.cmake
+
       - name: Display NDK HOME
         shell: bash
         run: |

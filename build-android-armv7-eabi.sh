@@ -44,6 +44,7 @@ echo "ANDROID_NDK: $ANDROID_NDK"
 sleep 1
 
 cmake -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
+    -DANDROID_USE_LEGACY_TOOLCHAIN_FILE=False \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_SHARED_LIBS=ON \
     -DSHERPA_NCNN_ENABLE_PORTAUDIO=OFF \
