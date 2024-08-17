@@ -53,11 +53,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ matrix.os }}-android
-
       - name: Display NDK HOME
         shell: bash
         run: |
@@ -67,9 +62,6 @@ jobs:
       - name: build android arm64-v8a
         shell: bash
         run: |
-          export CMAKE_CXX_COMPILER_LAUNCHER=ccache
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
           ./build-android-arm64-v8a.sh
           mkdir -p jniLibs/arm64-v8a/
@@ -78,9 +70,6 @@ jobs:
       - name: build android armv7-eabi
         shell: bash
         run: |
-          export CMAKE_CXX_COMPILER_LAUNCHER=ccache
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
           ./build-android-armv7-eabi.sh
           mkdir -p ./jniLibs/armeabi-v7a/
@@ -89,9 +78,6 @@ jobs:
       - name: build android x86_64
         shell: bash
         run: |
-          export CMAKE_CXX_COMPILER_LAUNCHER=ccache
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
           ./build-android-x86-64.sh
           mkdir -p ./jniLibs/x86_64
@@ -100,9 +86,6 @@ jobs:
       - name: build android x86
         shell: bash
         run: |
-          export CMAKE_CXX_COMPILER_LAUNCHER=ccache
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-
           export ANDROID_NDK=$ANDROID_NDK_LATEST_HOME
           ./build-android-x86.sh
           mkdir -p ./jniLibs/x86
