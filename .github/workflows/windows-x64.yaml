@@ -78,6 +78,11 @@ jobs:
           ls -lh ./bin/Release/decode-file-c-api.exe
           ls -lh ./bin/Release/sherpa-ncnn-microphone.exe
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exe-${{ matrix.vs-version }}-${{ matrix.toolset-version }}-${{ matrix.os }}
+          path: build/bin/Release/*
+
       - name: Test VAD
         shell: bash
         run: |
