@@ -94,7 +94,7 @@ void ParseOptions::RegisterTmpl(const std::string &name, T *ptr,
 template <typename T>
 void ParseOptions::RegisterCommon(const std::string &name, T *ptr,
                                   const std::string &doc, bool is_standard) {
-  if (ptr != nullptr) {
+  if (ptr == nullptr) {
     NCNN_LOGE("null ptr!");
     exit(-1);
   }

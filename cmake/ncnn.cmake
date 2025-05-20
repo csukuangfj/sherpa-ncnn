@@ -76,7 +76,7 @@ function(download_ncnn)
     # Concat
     # Convolution
     # Crop
-    Deconvolution
+    # Deconvolution # by gtcrn
     # Dropout
     Eltwise
     ELU
@@ -91,7 +91,7 @@ function(download_ncnn)
     MVN
     Pooling
     Power
-    PReLU
+    # PReLU  # by gtcrn
     Proposal
     # Reduction
     # ReLU
@@ -110,7 +110,7 @@ function(download_ncnn)
     # LSTM
     # BinaryOp
     # UnaryOp
-    ConvolutionDepthWise
+    # ConvolutionDepthWise # by gtcrn
     # Padding # required by innerproduct and convolution
     # Squeeze
     # ExpandDims
@@ -119,7 +119,7 @@ function(download_ncnn)
     PriorBox
     DetectionOutput
     Interp
-    DeconvolutionDepthWise
+    # DeconvolutionDepthWise # by gtcrn
     ShuffleChannel
     InstanceNorm
     Clip
@@ -144,9 +144,9 @@ function(download_ncnn)
     Swish
     # Gemm
     GroupNorm
-    LayerNorm
+    # LayerNorm  # by gtcrn
     Softplus
-    GRU
+    # GRU # by gtcrn
     MultiHeadAttention
     GELU
     # Convolution1D
@@ -164,10 +164,10 @@ function(download_ncnn)
     DeformableConv2D
     # GLU
     Fold
-    Unfold
+    # Unfold # by gtcrn
     GridSample
     CumulativeSum
-    CopyTo
+    # CopyTo
     Erf
     Diag
     CELU
@@ -180,10 +180,10 @@ function(download_ncnn)
     RelShift
   )
 
-  foreach(layer IN LISTS disabled_layers)
-    string(TOLOWER ${layer} name)
-    set(WITH_LAYER_${name} OFF CACHE BOOL "" FORCE)
-  endforeach()
+  # foreach(layer IN LISTS disabled_layers)
+  #   string(TOLOWER ${layer} name)
+  #   set(WITH_LAYER_${name} OFF CACHE BOOL "" FORCE)
+  # endforeach()
 
   FetchContent_GetProperties(ncnn)
   if(NOT ncnn_POPULATED)

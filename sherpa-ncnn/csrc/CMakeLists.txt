@@ -13,6 +13,13 @@ set(sherpa_ncnn_core_srcs
   meta-data.cc
   model.cc
   modified-beam-search-decoder.cc
+
+  offline-speech-denoiser-gtcrn-model-config.cc
+  offline-speech-denoiser-gtcrn-model.cc
+  offline-speech-denoiser-impl.cc
+  offline-speech-denoiser-model-config.cc
+  offline-speech-denoiser.cc
+
   parse-options.cc
   poolingmodulenoproj.cc
   recognizer.cc
@@ -53,6 +60,10 @@ if(NOT SHERPA_NCNN_ENABLE_PYTHON)
     add_executable(sherpa-ncnn-vad sherpa-ncnn-vad.cc)
     target_link_libraries(sherpa-ncnn-vad PRIVATE sherpa-ncnn-core)
     install(TARGETS sherpa-ncnn-vad DESTINATION bin)
+
+    add_executable(sherpa-ncnn-offline-denoiser sherpa-ncnn-offline-denoiser.cc)
+    target_link_libraries(sherpa-ncnn-offline-denoiser PRIVATE sherpa-ncnn-core)
+    install(TARGETS sherpa-ncnn-offline-denoiser DESTINATION bin)
 
     if(SHERPA_NCNN_HAS_ALSA)
       add_executable(sherpa-ncnn-alsa sherpa-ncnn-alsa.cc alsa.cc)

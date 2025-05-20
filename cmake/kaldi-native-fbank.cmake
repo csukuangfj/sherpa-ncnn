@@ -2,18 +2,18 @@ function(download_kaldi_native_fbank)
   include(FetchContent)
 
   # Please also change ../pack-for-embedded-systems.sh
-  set(kaldi_native_fbank_URL  "https://github.com/csukuangfj/kaldi-native-fbank/archive/refs/tags/v1.18.7.tar.gz")
-  set(kaldi_native_fbank_URL2 "https://hub.nuaa.cf/csukuangfj/kaldi-native-fbank/archive/refs/tags/v1.18.7.tar.gz")
-  set(kaldi_native_fbank_HASH "SHA256=e78fd9d481d83d7d6d1be0012752e6531cb614e030558a3491e3c033cb8e0e4e")
+  set(kaldi_native_fbank_URL   "https://github.com/csukuangfj/kaldi-native-fbank/archive/refs/tags/v1.21.1.tar.gz")
+  set(kaldi_native_fbank_URL2  "https://hf-mirror.com/csukuangfj/sherpa-onnx-cmake-deps/resolve/main/kaldi-native-fbank-1.21.1.tar.gz")
+  set(kaldi_native_fbank_HASH "SHA256=37c1aa230b00fe062791d800d8fc50aa3de215918d3dce6440699e67275d859e")
 
   # If you don't have access to the Internet, please download it to your
   # local drive and modify the following line according to your needs.
   set(possible_file_locations
-    $ENV{HOME}/Downloads/kaldi-native-fbank-1.18.7.tar.gz
-    $ENV{HOME}/asr/kaldi-native-fbank-1.18.7.tar.gz
-    ${PROJECT_SOURCE_DIR}/kaldi-native-fbank-1.18.7.tar.gz
-    ${PROJECT_BINARY_DIR}/kaldi-native-fbank-1.18.7.tar.gz
-    /tmp/kaldi-native-fbank-1.18.7.tar.gz
+    $ENV{HOME}/Downloads/kaldi-native-fbank-1.21.1.tar.gz
+    $ENV{HOME}/asr/kaldi-native-fbank-1.21.1.tar.gz
+    ${PROJECT_SOURCE_DIR}/kaldi-native-fbank-1.21.1.tar.gz
+    ${PROJECT_BINARY_DIR}/kaldi-native-fbank-1.21.1.tar.gz
+    /tmp/kaldi-native-fbank-1.21.1.tar.gz
   )
 
   foreach(f IN LISTS possible_file_locations)
